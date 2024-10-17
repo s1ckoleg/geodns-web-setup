@@ -1,0 +1,11 @@
+olegrumpy.ru {
+    file {{ coredns_workdir }}/db.olegrumpy.ru
+
+    transfer {
+        to {{ coredns_secondary_ip }}
+    }
+
+    health :8080
+    log
+    errors
+}

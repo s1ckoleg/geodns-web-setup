@@ -1,0 +1,12 @@
+---
+- name: Reload CoreDNS
+  become: true
+  ansible.builtin.systemd:
+    name: coredns
+    state: reloaded
+
+- name: Restart CoreDNS
+  become: true
+  ansible.builtin.systemd:
+    name: coredns
+    state: restarted

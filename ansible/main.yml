@@ -1,0 +1,6 @@
+---
+- hosts:
+    - ns1_olegrumpy_ru
+    - ns2_olegrumpy_ru
+  roles:
+    - coredns

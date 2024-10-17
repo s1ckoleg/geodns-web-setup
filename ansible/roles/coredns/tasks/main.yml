@@ -1,0 +1,91 @@
+---
+- name: Create coredns user
+  become: true
+  ansible.builtin.shell: useradd coredns || echo "User already exists."
+
+- name: Create workdir
+  become: true
+  ansible.builtin.shell: mkdir /etc/coredns || echo "Directory already exists."
+
+- name: Allow bind on ports < 1024
+  become: true
+  ansible.builtin.shell: echo 'net.ipv4.ip_unprivileged_port_start=0' > /etc/sysctl.d/99-unprivileged-ports.conf && sysctl -p /etc/sysctl.d/99-unprivileged-ports.conf
+
+#- name: Download CoreDNS archive
+#  become: true
+#  ansible.builtin.get_url:
+#    url: "{{ coredns_url }}"
+#    dest: "{{ coredns_workdir }}"
+#    owner: coredns
+#    group: coredns
+
+- name: Copy CoreDNS binary
+  become: true
+  ansible.builtin.copy:
+    src: "coredns"
+    dest: "/usr/local/bin/"
+    owner: "coredns"
+    group: "coredns"
+    mode: "0744"
+
+- name: Stop systemd-resolved
+  become: true
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: stopped
+
+#- name: Unpack CoreDNS archive
+#  become: true
+#  ansible.builtin.unarchive:
+#    src: "{{ coredns_workdir }}/{{ archive_name }}"
+#    dest: "/usr/local/bin/"
+#    remote_src: yes
+
+- name: Copy coredns.service
+  become: true
+  ansible.builtin.template:
+    src: "coredns.service.j2"
+    dest: "/etc/systemd/system/coredns.service"
+  notify:
+    - Reload CoreDNS
+
+- name: Copy zone file
+  become: true
+  ansible.builtin.template:
+    src: "olegrumpy.ru.j2"
+    dest: "{{ coredns_workdir }}/db.olegrumpy.ru"
+  when: coredns_is_primary is defined and coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Copy primary Corefile
+  become: true
+  ansible.builtin.template:
+    src: "Corefile.primary.j2"
+    dest: "{{ coredns_workdir }}/Corefile"
+  when: coredns_is_primary is defined and coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Copy secondary Corefile
+  become: true
+  ansible.builtin.template:
+    src: "Corefile.secondary.j2"
+    dest: "{{ coredns_workdir }}/Corefile"
+  when: coredns_is_primary is defined and not coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Change owner of workdir
+  become: true
+  ansible.builtin.shell: chown -R coredns:coredns {{ coredns_workdir }}
+
+- name: Allow TCP/UDP on port 53
+  become: true
+  ansible.builtin.shell: ufw allow 53
+
+- name: Start CoreDNS
+  become: true
+  ansible.builtin.systemd:
+    name: coredns
+    state: started

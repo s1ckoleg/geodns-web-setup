@@ -1,0 +1,8 @@
+---
+coredns_version: "1.11.3"
+archive_name: "coredns_{{ coredns_version }}_linux_amd64.tgz"
+coredns_url: "https://github.com/coredns/coredns/releases/download/v{{ coredns_version }}/{{ archive_name }}"
+coredns_workdir: "/etc/coredns"
+coredns_www_ip: "62.84.113.242"
+coredns_primary_ip: "51.250.13.216"
+coredns_secondary_ip: "51.250.43.59"
