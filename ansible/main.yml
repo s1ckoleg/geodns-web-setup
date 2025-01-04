@@ -4,3 +4,10 @@
     - ns2_olegrumpy_ru
   roles:
     - coredns
+
+- hosts:
+    - olegrumpy_ru
+    - olegrumpy_us
+    - olegrumpy_hk
+  roles:
+    - nginx
