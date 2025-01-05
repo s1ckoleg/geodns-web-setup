@@ -1,6 +1,6 @@
 olegrumpy.ru {
     view russia {
-      expr metadata('geoip/continent/code') in ['AF', 'EU']
+      expr metadata('geoip/continent/name') in ['Africa', 'Europe']
     }
     geoip /etc/coredns/GeoLite2-City.mmdb {
         edns-subnet
@@ -19,7 +19,7 @@ olegrumpy.ru {
 
 olegrumpy.ru {
     view usa {
-      expr metadata('geoip/continent/code') in ['AN', 'NA', 'SA']
+      expr metadata('geoip/continent/name') in ['Antarctica', 'North America', 'South America']
     }
     geoip /etc/coredns/GeoLite2-City.mmdb {
         edns-subnet
@@ -38,7 +38,7 @@ olegrumpy.ru {
 
 olegrumpy.ru {
     view asia {
-      expr metadata('geoip/continent/code') in ['AS', 'OC']
+      expr metadata('geoip/continent/name') in ['Asia', 'Oceania']
     }
     geoip /etc/coredns/GeoLite2-City.mmdb {
         edns-subnet

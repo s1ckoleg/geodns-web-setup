@@ -63,7 +63,7 @@
   ansible.builtin.template:
     src: "db-ru.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-ru.olegrumpy.ru"
-  when: coredns_is_primary is defined and coredns_is_primary
+#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
@@ -72,7 +72,7 @@
   ansible.builtin.template:
     src: "db-us.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-us.olegrumpy.ru"
-  when: coredns_is_primary is defined and coredns_is_primary
+#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
@@ -81,7 +81,7 @@
   ansible.builtin.template:
     src: "db-asia.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-asia.olegrumpy.ru"
-  when: coredns_is_primary is defined and coredns_is_primary
+#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
