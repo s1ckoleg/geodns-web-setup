@@ -28,6 +28,15 @@
     group: "coredns"
     mode: "0744"
 
+- name: Copy GeoLite DB
+  become: true
+  ansible.builtin.copy:
+    src: "GeoLite2-City.mmdb"
+    dest: "/etc/coredns/"
+    owner: "coredns"
+    group: "coredns"
+    mode: "0744"
+
 - name: Stop systemd-resolved
   become: true
   ansible.builtin.systemd:
@@ -49,11 +58,29 @@
   notify:
     - Reload CoreDNS
 
-- name: Copy zone file
+- name: Copy RU zone file
   become: true
   ansible.builtin.template:
-    src: "olegrumpy.ru.j2"
-    dest: "{{ coredns_workdir }}/db.olegrumpy.ru"
+    src: "db-ru.olegrumpy.ru.j2"
+    dest: "{{ coredns_workdir }}/db-ru.olegrumpy.ru"
+  when: coredns_is_primary is defined and coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Copy US zone file
+  become: true
+  ansible.builtin.template:
+    src: "db-us.olegrumpy.ru.j2"
+    dest: "{{ coredns_workdir }}/db-us.olegrumpy.ru"
+  when: coredns_is_primary is defined and coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Copy ASIA zone file
+  become: true
+  ansible.builtin.template:
+    src: "db-asia.olegrumpy.ru.j2"
+    dest: "{{ coredns_workdir }}/db-asia.olegrumpy.ru"
   when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS

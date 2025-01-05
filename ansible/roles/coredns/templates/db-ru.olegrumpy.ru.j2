@@ -1,0 +1,18 @@
+$ORIGIN olegrumpy.ru.
+$TTL 600
+@       IN  SOA ns1.olegrumpy.ru. s1ckoleg@mail.ru. (
+                2024101601  ; serial
+                3600        ; refresh
+                900         ; retry
+                604800      ; expire
+                86400       ; minimum
+                )
+
+        IN  NS  ns1.olegrumpy.ru.
+        IN  NS  ns2.olegrumpy.ru.
+
+ns1     IN  A   {{ coredns_primary_ip }}
+ns2     IN  A   {{ coredns_secondary_ip }}
+
+@       IN  A   {{ coredns_www_ru_ip }}
+www     IN  A   {{ coredns_www_ru_ip }}

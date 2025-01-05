@@ -1,5 +1,62 @@
 olegrumpy.ru {
-    file {{ coredns_workdir }}/db.olegrumpy.ru
+    view russia {
+      expr metadata('geoip/continent/code') in ['AF', 'EU']
+    }
+    geoip /etc/coredns/GeoLite2-City.mmdb {
+        edns-subnet
+    }
+    metadata
+    file {{ coredns_workdir }}/db-ru.olegrumpy.ru
+
+    transfer {
+        to {{ coredns_secondary_ip }}
+    }
+
+    health :8080
+    log
+    errors
+}
+
+olegrumpy.ru {
+    view usa {
+      expr metadata('geoip/continent/code') in ['AN', 'NA', 'SA']
+    }
+    geoip /etc/coredns/GeoLite2-City.mmdb {
+        edns-subnet
+    }
+    metadata
+    file {{ coredns_workdir }}/db-us.olegrumpy.ru
+
+    transfer {
+        to {{ coredns_secondary_ip }}
+    }
+
+    health :8080
+    log
+    errors
+}
+
+olegrumpy.ru {
+    view asia {
+      expr metadata('geoip/continent/code') in ['AS', 'OC']
+    }
+    geoip /etc/coredns/GeoLite2-City.mmdb {
+        edns-subnet
+    }
+    metadata
+    file {{ coredns_workdir }}/db-asia.olegrumpy.ru
+
+    transfer {
+        to {{ coredns_secondary_ip }}
+    }
+
+    health :8080
+    log
+    errors
+}
+
+olegrumpy.ru {
+    file {{ coredns_workdir }}/db-ru.olegrumpy.ru
 
     transfer {
         to {{ coredns_secondary_ip }}
