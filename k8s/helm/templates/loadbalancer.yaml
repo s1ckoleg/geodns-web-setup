@@ -1,0 +1,20 @@
+{{- range .Values.deployments }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-service-{{ .nodeLabel }}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: web
+    node: {{ .nodeLabel }}
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+{{- end }}

@@ -11,7 +11,7 @@ COPY files/default /etc/nginx/sites-available/
 
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
-COPY index.html /var/www/html/
+COPY files/index.html /var/www/html/
 
 RUN chmod 644 /etc/ssl/bundle.crt
 RUN chmod 600 /etc/ssl/certificate.key

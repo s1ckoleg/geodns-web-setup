@@ -1,0 +1,15 @@
+deployments:
+  - name: web-ru
+    nodeLabel: node-hk
+    replicas: 3
+  - name: web-hk
+    nodeLabel: node-hk
+    replicas: 3
+  - name: web-us
+    nodeLabel: node-us
+    replicas: 3
+
+image:
+  repository: cr.yandex/crpftiduupc1q0p2dmgt/web
+  tag: "0.6"
+  pullSecrets: regcred
