@@ -1,15 +1,21 @@
 deployments:
   - name: web-ru
-    nodeLabel: node-hk
+    nodeLabel: node-ru
     replicas: 3
+    externalIPs:
+      - "213.178.155.151"
   - name: web-hk
     nodeLabel: node-hk
     replicas: 3
+    externalIPs:
+      - "74.119.193.216"
   - name: web-us
     nodeLabel: node-us
     replicas: 3
+    externalIPs:
+      - "195.149.87.172"
 
 image:
   repository: cr.yandex/crpftiduupc1q0p2dmgt/web
-  tag: "0.6"
+  tag: "0.3"
   pullSecrets: regcred
