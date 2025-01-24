@@ -13,3 +13,8 @@
   roles:
     - nginx
     - k8s
+
+- hosts:
+    - grafana
+  roles:
+    - nginx
