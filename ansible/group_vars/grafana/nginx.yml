@@ -1,3 +1,4 @@
 ---
 main_text: "Here will be Grafana soon!"
 main_title: "Grafana"
+nginx_server_name: "grafana.olegrumpy.ru"
