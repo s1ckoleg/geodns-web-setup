@@ -1,0 +1,1 @@
+ansible-playbook -i inventory.hosts --diff --limit olegrumpy_ru --tag rollback --ask-vault-pass main.yml

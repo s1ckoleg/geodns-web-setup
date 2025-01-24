@@ -1,0 +1,37 @@
+---
+- name: Copy chart
+  become: true
+  ansible.builtin.copy:
+    src: "{{ src_helm_path }}"
+    dest: "/tmp"
+    mode: "0664"
+  when: is_master
+  tags:
+    - deploy
+
+- name: Install or Upgrade Helm release
+  kubernetes.core.helm:
+    name: "{{ release_name }}"
+    chart_ref: "{{ dest_helm_path }}"
+    release_namespace: "{{ namespace }}"
+    values_files:
+      - "{{ dest_helm_path }}/values.yaml"
+    state: present
+  register: helm_result
+  ignore_errors: true
+  when: is_master
+  tags:
+    - deploy
+
+- name: Show Helm output
+  debug:
+    var: helm_result
+  when: is_master
+  tags:
+    - deploy
+
+- name: Rollback Helm release
+  ansible.builtin.shell: "helm rollback {{ release_name }}"
+  when: is_master
+  tags:
+    - rollback

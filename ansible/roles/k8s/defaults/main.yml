@@ -1,0 +1,7 @@
+is_master: false
+src_helm_path: "{{ playbook_dir }}/../k8s/helm"
+dest_helm_path: "/tmp/helm"
+release_name: "web-release"
+namespace: "default"
+yandex_oauth: ""
+node_label: ""

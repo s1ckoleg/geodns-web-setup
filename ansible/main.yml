@@ -9,5 +9,7 @@
     - olegrumpy_ru
     - olegrumpy_us
     - olegrumpy_hk
+  any_errors_fatal: true
   roles:
     - nginx
+    - k8s

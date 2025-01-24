@@ -1,0 +1,333 @@
+---
+- name: Open common ports
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 22
+    - 80
+    - 443
+  tags:
+    - provision
+
+- name: Enable ufw
+  become: true
+  ansible.builtin.shell: "ufw --force enable"
+  tags:
+    - provision
+
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Upgrade all packages
+  become: true
+  apt:
+    upgrade: yes
+  tags:
+    - provision
+
+- name: Disable swap
+  become: true
+  ansible.builtin.shell: "swapoff -a"
+  tags:
+    - provision
+
+- name: Disable swap after restart
+  become: true
+  ansible.builtin.shell: 'sed -i "/ swap / s/^\(.*\)$/#\1/g" /etc/fstab'
+  tags:
+    - provision
+
+- name: Configure containerd modules
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/modules-load.d/containerd.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - overlay
+    - br_netfilter
+  tags:
+    - provision
+
+- name: Run modprobe
+  become: true
+  ansible.builtin.shell: "modprobe {{ item }}"
+  loop:
+    - overlay
+    - br_netfilter
+  tags:
+    - provision
+
+- name: Configure k8s config
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.d/kubernetes.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "net.bridge.bridge-nf-call-ip6tables = 1"
+    - "net.bridge.bridge-nf-call-iptables = 1"
+    - "net.ipv4.ip_forward = 1"
+  tags:
+    - provision
+
+- name: Reload changes
+  become: true
+  ansible.builtin.shell: "sysctl --system"
+  tags:
+    - provision
+
+- name: Install packages for containerd
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg2
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+    state: present
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Download Docker GPG
+  become: true
+  ansible.builtin.shell: "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg"
+  tags:
+    - provision
+
+- name: Add apt repository
+  become: true
+  ansible.builtin.shell: sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  tags:
+    - provision
+
+- name: Update apt cache with docker repo
+  become: true
+  apt:
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Install containerd io package
+  become: true
+  ansible.builtin.apt:
+    name:
+      - containerd.io
+    state: present
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Configurate containerd
+  become: true
+  ansible.builtin.shell: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+  tags:
+    - provision
+
+- name: Update containerd config
+  become: true
+  ansible.builtin.shell: 'sudo sed -i "s/SystemdCgroup \= false/SystemdCgroup \= true/g" /etc/containerd/config.toml'
+  tags:
+    - provision
+
+- name: Restart containerd service
+  become: true
+  ansible.builtin.systemd:
+    name: containerd
+    state: restarted
+    daemon_reload: yes
+  tags:
+    - provision
+
+- name: Enable containerd service
+  become: true
+  ansible.builtin.systemd:
+    name: containerd
+    enabled: yes
+  tags:
+    - provision
+
+- name: Install packages for k8s signing key
+  become: true
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+    state: present
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Download k8s signing key
+  become: true
+  ansible.builtin.shell: "curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+  tags:
+    - provision
+
+- name: Add k8s repo
+  become: true
+  ansible.builtin.shell: "echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list"
+  tags:
+    - provision
+
+- name: Update apt cache with k8s repo
+  become: true
+  apt:
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Install k8s packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    update_cache: yes
+  tags:
+    - provision
+
+- name: Init k8s cluster
+  become: true
+  ansible.builtin.shell: "kubeadm init"
+  when: is_master
+  tags:
+    - provision
+
+- name: Create kube directory at home
+  become: true
+  ansible.builtin.shell: "mkdir -p $HOME/.kube"
+  when: is_master
+  tags:
+    - provision
+
+- name: Copy k8s config
+  become: true
+  ansible.builtin.shell: "cp -f /etc/kubernetes/admin.conf $HOME/.kube/config"
+  when: is_master
+  tags:
+    - provision
+
+- name: Give rights to k8s config
+  become: true
+  ansible.builtin.shell: "chown $(id -u):$(id -g) $HOME/.kube/config"
+  when: is_master
+  tags:
+    - provision
+
+- name: Untaint master node
+  become: true
+  ansible.builtin.shell: "kubectl taint nodes --all node-role.kubernetes.io/control-plane-"
+  when: is_master
+  tags:
+    - provision
+
+- name: Deploy pod network
+  become: true
+  ansible.builtin.shell: "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml"
+  when: is_master
+  tags:
+    - provision
+
+- name: Open master port
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 179
+    - 6443
+  when: is_master
+  tags:
+    - provision
+
+- name: Open nodes port
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 179
+    - 10250
+  when: not is_master
+  tags:
+    - provision
+
+- name: Create join command
+  become: true
+  ansible.builtin.shell: "kubeadm token create --print-join-command"
+  when: is_master
+  register: join_command
+  tags:
+    - provision
+
+- name: Join master node
+  become: true
+  ansible.builtin.shell: "sudo {{ hostvars['olegrumpy_ru']['join_command']['stdout'] }}"
+  when: not is_master
+  tags:
+    - provision
+
+- name: Create admin conf
+  become: true
+  ansible.builtin.shell: "mv /etc/kubernetes/kubelet.conf /etc/kubernetes/admin.conf"
+  when: not is_master
+  tags:
+    - provision
+
+- name: Create kube directory at home on nodes
+  become: true
+  ansible.builtin.shell: "mkdir -p $HOME/.kube"
+  when: not is_master
+  tags:
+    - provision
+
+- name: Copy k8s config on nodes
+  become: true
+  ansible.builtin.shell: "cp -f /etc/kubernetes/admin.conf $HOME/.kube/config"
+  when: not is_master
+  tags:
+    - provision
+
+- name: Give rights to k8s config on nodes
+  become: true
+  ansible.builtin.shell: "chown $(id -u):$(id -g) $HOME/.kube/config"
+  when: not is_master
+  tags:
+    - provision
+
+- name: Set nodes labels
+  become: true
+  ansible.builtin.shell: "kubectl label nodes $(hostname) node={{ node_label }}"
+  tags:
+    - provision
+
+- name: Get Helm installation script
+  become: true
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get-helm-3.sh
+    mode: '0755'
+  when: is_master
+  tags:
+    - provision
+
+- name: Install Helm
+  become: true
+  ansible.builtin.shell: "/tmp/get-helm-3.sh"
+  when: is_master
+  tags:
+    - provision
+
+- name: Add Docker registry secret
+  become: true
+  ansible.builtin.shell: "kubectl create secret docker-registry regcred --docker-server=https://cr.yandex/ --docker-username=oauth --docker-password={{ yandex_oauth }} --docker-email=yndx-oleg-kalash@yandex.ru"
+  when: is_master and yandex_oauth is defined
+  tags:
+    - provision

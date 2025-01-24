@@ -1,0 +1,9 @@
+---
+- name: Include provision tasks
+  ansible.builtin.import_tasks:
+    file: provision.yml
+
+- name: Include Helm tasks
+  ansible.builtin.import_tasks:
+    file: helm.yml
+

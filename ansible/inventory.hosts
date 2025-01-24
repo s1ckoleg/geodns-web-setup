@@ -1,11 +1,11 @@
 [olegrumpy_ru]
-213.178.155.151
+olegrumpy_ru ansible_ssh_host=213.178.155.151 ansible_user=root
 
 [olegrumpy_us]
-195.149.87.172
+olegrumpy_us ansible_ssh_host=195.149.87.172  ansible_user=root
 
 [olegrumpy_hk]
-74.119.193.216
+olegrumpy_hk ansible_ssh_host=74.119.193.216  ansible_user=root
 
 [ns1_olegrumpy_ru]
 51.250.13.216
