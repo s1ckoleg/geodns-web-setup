@@ -78,8 +78,18 @@
 - name: Copy primary Corefile
   become: true
   ansible.builtin.template:
-    src: "Corefile.j2"
+    src: "Corefile.primary.j2"
     dest: "{{ coredns_workdir }}/Corefile"
+  when: coredns_is_primary is defined and coredns_is_primary
+  notify:
+    - Restart CoreDNS
+
+- name: Copy secondary Corefile
+  become: true
+  ansible.builtin.template:
+    src: "Corefile.secondary.j2"
+    dest: "{{ coredns_workdir }}/Corefile"
+  when: coredns_is_primary is defined and not coredns_is_primary
   notify:
     - Restart CoreDNS
 

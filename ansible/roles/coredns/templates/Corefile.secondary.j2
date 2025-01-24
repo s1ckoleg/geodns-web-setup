@@ -58,8 +58,20 @@ olegrumpy.ru {
 olegrumpy.ru {
     file {{ coredns_workdir }}/db-ru.olegrumpy.ru
 
-    transfer {
-        to {{ coredns_secondary_ip }}
+    secondary {
+        transfer from {{ coredns_primary_ip }}
+    }
+
+    health :8080
+    log
+    errors
+}
+
+grafana.olegrumpy.ru {
+    file {{ coredns_workdir }}/db-ru.olegrumpy.ru
+
+    secondary {
+        transfer from {{ coredns_primary_ip }}
     }
 
     health :8080
