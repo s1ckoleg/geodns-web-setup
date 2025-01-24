@@ -43,13 +43,6 @@
     name: systemd-resolved
     state: stopped
 
-#- name: Unpack CoreDNS archive
-#  become: true
-#  ansible.builtin.unarchive:
-#    src: "{{ coredns_workdir }}/{{ archive_name }}"
-#    dest: "/usr/local/bin/"
-#    remote_src: yes
-
 - name: Copy coredns.service
   become: true
   ansible.builtin.template:
@@ -63,7 +56,6 @@
   ansible.builtin.template:
     src: "db-ru.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-ru.olegrumpy.ru"
-#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
@@ -72,7 +64,6 @@
   ansible.builtin.template:
     src: "db-us.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-us.olegrumpy.ru"
-#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
@@ -81,25 +72,14 @@
   ansible.builtin.template:
     src: "db-asia.olegrumpy.ru.j2"
     dest: "{{ coredns_workdir }}/db-asia.olegrumpy.ru"
-#  when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
 
 - name: Copy primary Corefile
   become: true
   ansible.builtin.template:
-    src: "Corefile.primary.j2"
+    src: "Corefile.j2"
     dest: "{{ coredns_workdir }}/Corefile"
-  when: coredns_is_primary is defined and coredns_is_primary
-  notify:
-    - Restart CoreDNS
-
-- name: Copy secondary Corefile
-  become: true
-  ansible.builtin.template:
-    src: "Corefile.secondary.j2"
-    dest: "{{ coredns_workdir }}/Corefile"
-  when: coredns_is_primary is defined and not coredns_is_primary
   notify:
     - Restart CoreDNS
 

@@ -1,5 +1,8 @@
 venv
 
+# Large files
+ansible/roles/coredns/files/*
+
 # Certificates
 ansible/roles/nginx/files/*
 docker/files/bundle.crt
