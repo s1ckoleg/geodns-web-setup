@@ -1,8 +1,5 @@
 venv
 
-# Coredns binary and mmdb
-ansible/roles/coredns/files/*
-
 # Certificates
 ansible/roles/nginx/files/*
 docker/files/bundle.crt
