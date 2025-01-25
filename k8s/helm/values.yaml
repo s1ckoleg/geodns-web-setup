@@ -17,5 +17,5 @@ deployments:
 
 image:
   repository: cr.yandex/crpftiduupc1q0p2dmgt/web
-  tag: "0.3.1"
+  tag: "0.3.2"
   pullSecrets: regcred
