@@ -11,10 +11,11 @@
     - olegrumpy_hk
   any_errors_fatal: true
   roles:
-    - nginx
     - k8s
 
 - hosts:
-    - grafana
+    - monitoring
   roles:
     - nginx
+    - prometheus
+    - grafana

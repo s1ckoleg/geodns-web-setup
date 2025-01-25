@@ -1,0 +1,18 @@
+[Unit]
+Description=Background service of Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+	--config.file {{ prometheus_main_path }}/prometheus.yml \
+	--storage.tsdb.path {{ prometheus_tsdb_path }}/ \
+    --web.console.templates={{ prometheus_main_path }}/consoles \
+    --web.console.libraries={{ prometheus_main_path }}/console_libraries \
+    --web.listen-address=0.0.0.0:9090
+
+[Install]
+WantedBy=multi-user.target

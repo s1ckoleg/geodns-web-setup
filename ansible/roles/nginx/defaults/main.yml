@@ -1,3 +1,28 @@
 main_text: "Hello World!"
 main_title: "olegrumpy.ru"
-nginx_server_name: "olegrumpy.ru"
+nginx_http_config: |+
+  server {
+      listen 80;
+      listen [::]:80;
+      server_name olegrumpy.ru;
+
+      # Redirect all HTTP requests to HTTPS
+      return 301 https://$server_name$request_uri;
+  }
+
+  server {
+      listen 443 ssl http2;
+      listen [::]:443 ssl http2;
+      server_name olegrumpy.ru;
+
+      ssl_certificate /etc/ssl/bundle.crt;
+      ssl_certificate_key /etc/ssl/certificate.key;
+
+      root /var/www/html;
+
+      index index.html index.htm index.nginx-debian.html;
+
+      location / {
+          try_files $uri $uri/ =404;
+      }
+  }

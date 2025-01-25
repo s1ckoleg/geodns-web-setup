@@ -4,6 +4,8 @@
   ansible.builtin.apt:
     name: nginx
     state: present
+  tags:
+    - nginx
 
 - name: Copy Certificates Bundle
   become: true
@@ -15,6 +17,8 @@
     mode: "0644"
   notify:
     - Restart Nginx
+  tags:
+    - nginx
 
 - name: Copy Certificate Key
   become: true
@@ -24,6 +28,8 @@
     owner: "root"
     group: "root"
     mode: "0644"
+  tags:
+    - nginx
 
 - name: Start Nginx service
   become: true
@@ -31,6 +37,8 @@
     name: nginx
     state: started
     enabled: yes
+  tags:
+    - nginx
 
 - name: Copy Nginx Configuration file
   become: true
@@ -39,17 +47,26 @@
     dest: "/etc/nginx/nginx.conf"
   notify:
     - Restart Nginx
+  tags:
+    - nginx
 
-- name: Copy Nginx Server file
+- name: Copy Nginx http config
   become: true
-  ansible.builtin.template:
-    src: "default.j2"
+  ansible.builtin.copy:
+    content: "{{ nginx_http_config }}"
     dest: "/etc/nginx/sites-available/default"
+    mode: "0644"
+    owner: root
+    group: root
   notify:
     - Restart Nginx
+  tags:
+    - nginx
 
 - name: Copy Index file
   become: true
   ansible.builtin.template:
     src: "index.html.j2"
     dest: "/var/www/html/index.html"
+  tags:
+    - nginx

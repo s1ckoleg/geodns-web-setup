@@ -13,5 +13,5 @@ olegrumpy_hk ansible_ssh_host=74.119.193.216  ansible_user=root
 [ns2_olegrumpy_ru]
 51.250.43.59
 
-[grafana]
+[monitoring]
 89.169.130.200

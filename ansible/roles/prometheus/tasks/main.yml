@@ -1,0 +1,128 @@
+---
+- name: Create prometheus group
+  become: true
+  ansible.builtin.shell: "sudo groupadd --system prometheus || true"
+  tags:
+    - prometheus
+
+- name: Create prometheus user
+  become: true
+  ansible.builtin.shell: "sudo useradd -s /sbin/nologin --system -g prometheus prometheus || true"
+  tags:
+    - prometheus
+
+- name: Download Prometheus archive
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    mode: '0755'
+  tags:
+    - prometheus
+
+- name: Unarchive Prometheus
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+    owner: prometheus
+    group: prometheus
+  tags:
+    - prometheus
+
+- name: Delete downloaded archive
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    state: absent
+  tags:
+    - prometheus
+
+- name: Move Prometheus binaries
+  become: true
+  ansible.builtin.shell: "mv {{ item }} /usr/local/bin || true"
+  loop:
+    - "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+    - "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/promtool"
+  tags:
+    - prometheus
+
+- name: Create Prometheus directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  loop:
+    - "{{ prometheus_main_path }}"
+    - "{{ prometheus_main_path }}/consoles"
+    - "{{ prometheus_main_path }}/console_libraries"
+    - "{{ prometheus_tsdb_path }}"
+  tags:
+    - prometheus
+
+- name: Copy Prometheus config
+  become: true
+  ansible.builtin.template:
+    src: "prometheus.yml.j2"
+    dest: "{{ prometheus_main_path }}/prometheus.yml"
+    owner: "prometheus"
+    group: "prometheus"
+  notify:
+    - Restart Prometheus
+  tags:
+    - prometheus
+
+- name: Copy web console files
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ prometheus_main_path }}/consoles/"
+    owner: "prometheus"
+    group: "prometheus"
+    mode: "0744"
+  loop:
+    - "index.html.example"
+    - "node.html"
+    - "node-cpu.html"
+    - "node-disk.html"
+    - "node-overview.html"
+    - "prometheus.html"
+    - "prometheus-overview.html"
+  tags:
+    - prometheus
+
+- name: Copy web console libraries
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ prometheus_main_path }}/console_libraries/"
+    owner: "prometheus"
+    group: "prometheus"
+    mode: "0744"
+  loop:
+    - "menu.lib"
+    - "prom.lib"
+  tags:
+    - prometheus
+
+- name: Copy prometheus.service
+  become: true
+  ansible.builtin.template:
+    src: "prometheus.service.j2"
+    dest: "/etc/systemd/system/prometheus.service"
+  notify:
+    - Reload Prometheus
+  tags:
+    - prometheus
+
+- name: Start Prometheus
+  become: true
+  ansible.builtin.systemd:
+    name: prometheus
+    state: started
+  tags:
+    - prometheus

@@ -1,0 +1,41 @@
+---
+- name: Download Grafana package
+  become: true
+  ansible.builtin.get_url:
+    url: "https://mirrors.cloud.tencent.com/grafana/apt/pool/main/g/grafana-enterprise/grafana-enterprise_{{ grafana_version }}_amd64.deb"
+    dest: "/tmp/grafana-enterprise_{{ grafana_version }}_amd64.deb"
+    mode: "0755"
+  tags:
+    - grafana
+
+- name: Install packages for Grafana
+  become: true
+  ansible.builtin.apt:
+    name:
+      - adduser
+      - libfontconfig1
+      - musl
+    state: present
+    update_cache: yes
+  tags:
+    - grafana
+
+- name: Fix broken packages
+  become: true
+  ansible.builtin.shell: "apt --fix-broken install"
+  tags:
+    - grafana
+
+- name: Install Grafana package
+  become: true
+  ansible.builtin.shell: "dpkg -i /tmp/grafana-enterprise_*_amd64.deb"
+  tags:
+    - grafana
+
+- name: Start and enable Grafana
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+  tags:
+    - grafana
