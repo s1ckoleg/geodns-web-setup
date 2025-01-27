@@ -1,4 +1,19 @@
 ---
+- name: Open common ports
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 22
+    - 9090
+  tags:
+    - prometheus
+
+- name: Enable ufw
+  become: true
+  ansible.builtin.shell: "ufw --force enable"
+  tags:
+    - prometheus
+
 - name: Create prometheus group
   become: true
   ansible.builtin.shell: "sudo groupadd --system prometheus || true"
@@ -115,7 +130,7 @@
     src: "prometheus.service.j2"
     dest: "/etc/systemd/system/prometheus.service"
   notify:
-    - Reload Prometheus
+    - Reload Daemon
   tags:
     - prometheus
 
@@ -124,5 +139,6 @@
   ansible.builtin.systemd:
     name: prometheus
     state: started
+    enabled: yes
   tags:
     - prometheus

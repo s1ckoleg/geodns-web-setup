@@ -1,17 +1,17 @@
 [olegrumpy_ru]
-olegrumpy_ru ansible_ssh_host=213.178.155.151 ansible_user=root
+node_ru ansible_ssh_host=213.178.155.151 ansible_user=root
 
 [olegrumpy_us]
-olegrumpy_us ansible_ssh_host=195.149.87.172  ansible_user=root
+node_us ansible_ssh_host=195.149.87.172  ansible_user=root
 
 [olegrumpy_hk]
-olegrumpy_hk ansible_ssh_host=74.119.193.216  ansible_user=root
+node_hk ansible_ssh_host=74.119.193.216  ansible_user=root
 
 [ns1_olegrumpy_ru]
-51.250.13.216
+dns1 ansible_ssh_host=51.250.13.216
 
 [ns2_olegrumpy_ru]
-51.250.43.59
+dns2 ansible_ssh_host=51.250.43.59
 
 [monitoring]
-89.169.130.200
+monitor ansible_ssh_host=89.169.130.200

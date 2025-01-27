@@ -20,10 +20,31 @@ rule_files:
 # Here it's Prometheus itself.
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: "prometheus"
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
+  - job_name: "node"
     static_configs:
-      - targets: ["0.0.0.0:9090"]
+      - targets: ["localhost:9100"]
+        labels:
+          instance: "monitoring"
+      - targets: ["51.250.13.216:9100"]
+        labels:
+          instance: "dns1"
+      - targets: ["51.250.43.59:9100"]
+        labels:
+          instance: "dns2"
+      - targets: ["213.178.155.151:9100"]
+        labels:
+          instance: "node_ru"
+      - targets: ["195.149.87.172:9100"]
+        labels:
+          instance: "node_us"
+      - targets: ["74.119.193.216:9100"]
+        labels:
+          instance: "node_hk"
+  - job_name: "coredns"
+    static_configs:
+      - targets: ["51.250.13.216:9153"]
+        labels:
+          instance: "dns1"
+      - targets: ["51.250.43.59:9153"]
+        labels:
+          instance: "dns2"

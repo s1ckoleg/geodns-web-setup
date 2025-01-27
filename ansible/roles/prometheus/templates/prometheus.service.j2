@@ -13,6 +13,10 @@ ExecStart=/usr/local/bin/prometheus \
     --web.console.templates={{ prometheus_main_path }}/consoles \
     --web.console.libraries={{ prometheus_main_path }}/console_libraries \
     --web.listen-address=0.0.0.0:9090
+    --storage.tsdb.retention.size=10GB
+
+Restart=always
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target

@@ -1,23 +1,84 @@
 ---
+- name: Open common ports
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 22
+    - 53
+    - 9153
+  tags:
+    - coredns
+
+- name: Enable ufw
+  become: true
+  ansible.builtin.shell: "ufw --force enable"
+  tags:
+    - coredns
+
+- name: Hardcode GitHub DNS records
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "140.82.121.4 github.com"
+    - "185.199.110.133 objects.githubusercontent.com"
+  tags:
+    - coredns
+
 - name: Create coredns user
   become: true
   ansible.builtin.shell: useradd coredns || echo "User already exists."
+  tags:
+    - coredns
 
 - name: Create workdir
   become: true
   ansible.builtin.shell: mkdir /etc/coredns || echo "Directory already exists."
+  tags:
+    - coredns
 
 - name: Allow bind on ports < 1024
   become: true
   ansible.builtin.shell: echo 'net.ipv4.ip_unprivileged_port_start=0' > /etc/sysctl.d/99-unprivileged-ports.conf && sysctl -p /etc/sysctl.d/99-unprivileged-ports.conf
+  tags:
+    - coredns
 
-#- name: Download CoreDNS archive
-#  become: true
-#  ansible.builtin.get_url:
-#    url: "{{ coredns_url }}"
-#    dest: "{{ coredns_workdir }}"
-#    owner: coredns
-#    group: coredns
+- name: Download CoreDNS archive
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/coredns/coredns/releases/download/v{{ coredns_version }}/coredns_{{ coredns_version }}_linux_amd64.tgz"
+    dest: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
+    owner: coredns
+    group: coredns
+  tags:
+    - coredns
+
+- name: Unarchive CoreDNS
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
+    dest: "/tmp"
+    remote_src: yes
+    owner: coredns
+    group: coredns
+  tags:
+    - coredns
+
+- name: Delete downloaded archive
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
+    state: absent
+  tags:
+    - coredns
+
+- name: Move CoreDNS binaries
+  become: true
+  ansible.builtin.shell: "mv /tmp/coredns_{{ coredns_version }}_linux_amd64/coredns /usr/local/bin || true"
+  tags:
+    - coredns
 
 - name: Copy CoreDNS binary
   become: true
@@ -27,6 +88,8 @@
     owner: "coredns"
     group: "coredns"
     mode: "0744"
+  tags:
+    - coredns
 
 - name: Copy GeoLite DB
   become: true
@@ -36,12 +99,16 @@
     owner: "coredns"
     group: "coredns"
     mode: "0744"
+  tags:
+    - coredns
 
 - name: Stop systemd-resolved
   become: true
   ansible.builtin.systemd:
     name: systemd-resolved
     state: stopped
+  tags:
+    - coredns
 
 - name: Copy coredns.service
   become: true
@@ -50,6 +117,8 @@
     dest: "/etc/systemd/system/coredns.service"
   notify:
     - Reload CoreDNS
+  tags:
+    - coredns
 
 - name: Copy RU zone file
   become: true
@@ -58,6 +127,8 @@
     dest: "{{ coredns_workdir }}/db-ru.olegrumpy.ru"
   notify:
     - Restart CoreDNS
+  tags:
+    - coredns
 
 - name: Copy US zone file
   become: true
@@ -66,6 +137,8 @@
     dest: "{{ coredns_workdir }}/db-us.olegrumpy.ru"
   notify:
     - Restart CoreDNS
+  tags:
+    - coredns
 
 - name: Copy ASIA zone file
   become: true
@@ -74,6 +147,8 @@
     dest: "{{ coredns_workdir }}/db-asia.olegrumpy.ru"
   notify:
     - Restart CoreDNS
+  tags:
+    - coredns
 
 - name: Copy primary Corefile
   become: true
@@ -83,6 +158,8 @@
   when: coredns_is_primary is defined and coredns_is_primary
   notify:
     - Restart CoreDNS
+  tags:
+    - coredns
 
 - name: Copy secondary Corefile
   become: true
@@ -92,17 +169,25 @@
   when: coredns_is_primary is defined and not coredns_is_primary
   notify:
     - Restart CoreDNS
+  tags:
+    - coredns
 
 - name: Change owner of workdir
   become: true
   ansible.builtin.shell: chown -R coredns:coredns {{ coredns_workdir }}
+  tags:
+    - coredns
 
 - name: Allow TCP/UDP on port 53
   become: true
   ansible.builtin.shell: ufw allow 53
+  tags:
+    - coredns
 
 - name: Start CoreDNS
   become: true
   ansible.builtin.systemd:
     name: coredns
     state: started
+  tags:
+    - coredns

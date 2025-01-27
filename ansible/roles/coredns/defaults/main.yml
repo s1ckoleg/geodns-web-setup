@@ -1,7 +1,5 @@
 ---
 coredns_version: "1.11.3"
-archive_name: "coredns_{{ coredns_version }}_linux_amd64.tgz"
-coredns_url: "https://github.com/coredns/coredns/releases/download/v{{ coredns_version }}/{{ archive_name }}"
 coredns_workdir: "/etc/coredns"
 coredns_www_ru_ip: "213.178.155.151"
 coredns_www_us_ip: "195.149.87.172"

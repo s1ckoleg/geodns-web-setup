@@ -1,0 +1,83 @@
+---
+- name: Open ssh ports
+  become: true
+  ansible.builtin.shell: "ufw allow 22"
+  tags:
+    - node_exporter
+
+- name: Open node exporter port
+  become: true
+  ansible.builtin.shell: "ufw allow from 89.169.130.200/32 to any port 9100"
+  tags:
+    - node_exporter
+
+- name: Enable ufw
+  become: true
+  ansible.builtin.shell: "ufw --force enable"
+  tags:
+    - node_exporter
+
+- name: Create node_exporter group
+  become: true
+  ansible.builtin.shell: "sudo groupadd --system node_exporter || true"
+  tags:
+    - node_exporter
+
+- name: Create node_exporter user
+  become: true
+  ansible.builtin.shell: "sudo useradd -s /sbin/nologin --system -g node_exporter node_exporter || true"
+  tags:
+    - node_exporter
+
+- name: Download node exporter archive
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    mode: '0755'
+  tags:
+    - node_exporter
+
+- name: Unarchive node exporter
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+    owner: node_exporter
+    group: node_exporter
+  tags:
+    - node_exporter
+
+- name: Delete downloaded archive
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    state: absent
+  tags:
+    - node_exporter
+
+- name: Move node exporter binariy
+  become: true
+  ansible.builtin.shell: "mv /tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter /usr/local/bin || true"
+  tags:
+    - node_exporter
+
+- name: Copy node_exporter.service
+  become: true
+  ansible.builtin.template:
+    src: "node_exporter.service.j2"
+    dest: "/etc/systemd/system/node_exporter.service"
+  notify:
+    - Reload Daemon
+  tags:
+    - node_exporter
+
+- name: Start Node Exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+  tags:
+    - node_exporter

@@ -1,4 +1,19 @@
 ---
+- name: Open common ports
+  become: true
+  ansible.builtin.shell: "ufw allow {{ item }}"
+  loop:
+    - 22
+    - 3000
+  tags:
+    - grafana
+
+- name: Enable ufw
+  become: true
+  ansible.builtin.shell: "ufw --force enable"
+  tags:
+    - grafana
+
 - name: Download Grafana package
   become: true
   ansible.builtin.get_url:
