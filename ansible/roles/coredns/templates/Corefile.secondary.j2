@@ -70,15 +70,3 @@ olegrumpy.ru {
     log
     errors
 }
-
-grafana.olegrumpy.ru {
-    file {{ coredns_workdir }}/db-ru.olegrumpy.ru
-
-    secondary {
-        transfer from {{ coredns_primary_ip }}
-    }
-
-    health :8080
-    log
-    errors
-}
