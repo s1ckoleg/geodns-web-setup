@@ -12,10 +12,10 @@
 - name: Install or Upgrade Helm release
   kubernetes.core.helm:
     name: "{{ release_name }}"
-    chart_ref: "{{ dest_helm_path }}"
+    chart_ref: "{{ dest_helm_path }}/{{ release_name }}"
     release_namespace: "{{ namespace }}"
     values_files:
-      - "{{ dest_helm_path }}/values.yaml"
+      - "{{ dest_helm_path }}/{{ release_name }}/values.yaml"
     state: present
   register: helm_result
   ignore_errors: true

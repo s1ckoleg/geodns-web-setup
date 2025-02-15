@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entry
+spec:
+  replicas: {{ $.Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $.Values.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Values.deployment.name }}
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: {{ $.Values.deployment.name }}
+      containers:
+      - name: {{ $.Values.deployment.name }}
+        image: {{ $.Values.deployment.image }}:{{ $.Values.deployment.version }}
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+      imagePullSecrets:
+      - name: {{ $.Values.deployment.pullSecrets }}

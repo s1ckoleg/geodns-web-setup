@@ -5,5 +5,5 @@ ansible/roles/coredns/files/*
 
 # Certificates
 ansible/roles/nginx/files/*
-docker/files/bundle.crt
-docker/files/certificate.key
+docker/web-main/files/bundle.crt
+docker/web-main/files/certificate.key
