@@ -1,1 +1,1 @@
-ansible-playbook -i inventory.hosts --diff --limit olegrumpy_ru --tag rollback --ask-vault-pass main.yml
+ansible-playbook -i inventory.hosts --diff --limit olegrumpy_ru --tag rollback --ask-vault-pass -e "release_name:$1" main.yml
