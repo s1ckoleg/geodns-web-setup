@@ -1,0 +1,6 @@
+deployment:
+  name: sixcities
+  replicas: 3
+  image: cr.yandex/crpftiduupc1q0p2dmgt/sixcities
+  version: "0.1"
+  pullSecrets: regcred
