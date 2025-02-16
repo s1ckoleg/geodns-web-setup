@@ -4,6 +4,4 @@ venv
 ansible/roles/coredns/files/*
 
 # Certificates
-ansible/roles/nginx/files/*
-docker/web-main/files/bundle.crt
-docker/web-main/files/certificate.key
+certificate.key
