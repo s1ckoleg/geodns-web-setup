@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ $.Values.component }}
+    app.kubernetes.io/name: {{ $.Values.name }}
+    app.kubernetes.io/version: {{ $.Values.version }}
+  name: {{ $.Values.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $.Values.name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $.Values.name }}
+  namespace: {{ $.Values.namespace }}

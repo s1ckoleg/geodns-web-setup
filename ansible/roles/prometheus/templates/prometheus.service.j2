@@ -12,8 +12,9 @@ ExecStart=/usr/local/bin/prometheus \
 	--storage.tsdb.path {{ prometheus_tsdb_path }}/ \
     --web.console.templates={{ prometheus_main_path }}/consoles \
     --web.console.libraries={{ prometheus_main_path }}/console_libraries \
-    --web.listen-address=0.0.0.0:9090
-    --storage.tsdb.retention.size=10GB
+    --web.listen-address=0.0.0.0:9090 \
+    --storage.tsdb.retention.size=10GB \
+    --web.enable-admin-api
 
 Restart=always
 RestartSec=1

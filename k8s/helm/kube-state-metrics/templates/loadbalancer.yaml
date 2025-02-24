@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ $.Values.component }}
+    app.kubernetes.io/name: {{ $.Values.name }}
+    app.kubernetes.io/version: {{ $.Values.version }}
+  name: {{ $.Values.name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  type: LoadBalancer
+  externalIPs: {{ $.Values.externalIPs }}
+  ports:
+  - name: http-metrics
+    port: {{ $.Values.httpMetricsPort }}
+    targetPort: http-metrics
+  - name: telemetry
+    port: {{ $.Values.telemetryPort }}
+    targetPort: telemetry
+  selector:
+    app.kubernetes.io/name: {{ $.Values.name }}

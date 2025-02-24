@@ -1,0 +1,8 @@
+name: kube-state-metrics
+version: 2.15.0
+component: exporter
+namespace: kube-system
+httpMetricsPort: 8080
+telemetryPort: 8081
+externalIPs:
+  - 213.178.155.151

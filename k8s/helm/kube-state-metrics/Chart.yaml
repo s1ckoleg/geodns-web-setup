@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kube-state-metrics
+description: A Helm chart for kube-state-metrics service
+version: 0.0.1

@@ -48,3 +48,10 @@ scrape_configs:
       - targets: ["51.250.43.59:9153"]
         labels:
           instance: "dns2"
+  - job_name: "kube-state-metrics"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["213.178.155.151:8080"]
+    metric_relabel_configs:
+      - target_label: cluster
+        replacement: main

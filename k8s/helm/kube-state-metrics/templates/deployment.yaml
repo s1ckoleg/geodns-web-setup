@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ $.Values.component }}
+    app.kubernetes.io/name: {{ $.Values.name }}
+    app.kubernetes.io/version: {{ $.Values.version }}
+  name: {{ $.Values.name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $.Values.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: {{ $.Values.component }}
+        app.kubernetes.io/name: {{ $.Values.name }}
+        app.kubernetes.io/version: {{ $.Values.version }}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - image: registry.k8s.io/{{ $.Values.name }}/{{ $.Values.name }}:v{{ $.Values.version }}
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: http-metrics
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: {{ $.Values.name }}
+        ports:
+        - containerPort: {{ $.Values.httpMetricsPort }}
+          name: http-metrics
+        - containerPort: {{ $.Values.telemetryPort }}
+          name: telemetry
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: telemetry
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          seccompProfile:
+            type: RuntimeDefault
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: {{ $.Values.name }}
