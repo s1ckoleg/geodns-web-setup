@@ -2,5 +2,5 @@ deployment:
   name: web
   replicas: 6
   image: cr.yandex/crpftiduupc1q0p2dmgt/web
-  version: "2.1"
+  version: "2.2"
   pullSecrets: regcred
