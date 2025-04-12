@@ -9,6 +9,7 @@ COPY files/default /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 COPY files/index.html /var/www/html/
+COPY files/styles.css /var/www/html/
 
 RUN nginx -t
 
