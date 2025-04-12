@@ -1,16 +1,28 @@
 olegrumpy.ru {
+    view russia_asia {
+      expr metadata('geoip/subdivision') in ['PRI', 'KHA', 'YEV', 'AMU', 'SA', 'SAK', 'MAG', 'KAM', 'CHU']
+    }
+    geoip /etc/coredns/GeoIP2-City.mmdb {
+        edns-subnet
+    }
+    metadata
+    file {{ coredns_workdir }}/db-asia.olegrumpy.ru
+
+    health :8080
+    prometheus :9153
+    log
+    errors
+}
+
+olegrumpy.ru {
     view russia {
       expr metadata('geoip/continent/name') in ['Africa', 'Europe']
     }
-    geoip /etc/coredns/GeoLite2-City.mmdb {
+    geoip /etc/coredns/GeoIP2-City.mmdb {
         edns-subnet
     }
     metadata
     file {{ coredns_workdir }}/db-ru.olegrumpy.ru
-
-    transfer {
-        to {{ coredns_secondary_ip }}
-    }
 
     health :8080
     prometheus :9153
@@ -22,7 +34,7 @@ olegrumpy.ru {
     view usa {
       expr metadata('geoip/continent/name') in ['Antarctica', 'North America', 'South America']
     }
-    geoip /etc/coredns/GeoLite2-City.mmdb {
+    geoip /etc/coredns/GeoIP2-City.mmdb {
         edns-subnet
     }
     metadata
@@ -42,7 +54,7 @@ olegrumpy.ru {
     view asia {
       expr metadata('geoip/continent/name') in ['Asia', 'Oceania']
     }
-    geoip /etc/coredns/GeoLite2-City.mmdb {
+    geoip /etc/coredns/GeoIP2-City.mmdb {
         edns-subnet
     }
     metadata

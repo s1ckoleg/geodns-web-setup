@@ -45,41 +45,6 @@
   tags:
     - coredns
 
-- name: Download CoreDNS archive
-  become: true
-  ansible.builtin.get_url:
-    url: "https://github.com/coredns/coredns/releases/download/v{{ coredns_version }}/coredns_{{ coredns_version }}_linux_amd64.tgz"
-    dest: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
-    owner: coredns
-    group: coredns
-  tags:
-    - coredns
-
-- name: Unarchive CoreDNS
-  become: true
-  ansible.builtin.unarchive:
-    src: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
-    dest: "/tmp"
-    remote_src: yes
-    owner: coredns
-    group: coredns
-  tags:
-    - coredns
-
-- name: Delete downloaded archive
-  become: true
-  ansible.builtin.file:
-    path: "/tmp/coredns_{{ coredns_version }}_linux_amd64.tgz"
-    state: absent
-  tags:
-    - coredns
-
-- name: Move CoreDNS binaries
-  become: true
-  ansible.builtin.shell: "mv /tmp/coredns_{{ coredns_version }}_linux_amd64/coredns /usr/local/bin || true"
-  tags:
-    - coredns
-
 - name: Copy CoreDNS binary
   become: true
   ansible.builtin.copy:
@@ -94,7 +59,7 @@
 - name: Copy GeoLite DB
   become: true
   ansible.builtin.copy:
-    src: "GeoLite2-City.mmdb"
+    src: "GeoIP2-City.mmdb"
     dest: "/etc/coredns/"
     owner: "coredns"
     group: "coredns"
