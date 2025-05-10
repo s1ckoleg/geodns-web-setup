@@ -1,4 +1,4 @@
 apiVersion: v2
 name: entry-chart
 description: A Helm chart for entry proxy service
-version: 0.0.5
+version: 0.0.9

@@ -6,8 +6,9 @@ metadata:
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
+  internalTrafficPolicy: Local
   selector:
-    app: {{ $.Values.deployment.name }}
+    app.kubernetes.io/name: {{ $.Values.deployment.name }}
   ports:
   - name: http
     port: 80

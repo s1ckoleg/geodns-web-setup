@@ -1,4 +1,4 @@
 apiVersion: v2
 name: sixcities-chart
 description: A Helm chart for sixcities service
-version: 0.0.1
+version: 0.0.4
