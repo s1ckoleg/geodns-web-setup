@@ -59,7 +59,7 @@
 - name: Copy GeoLite DB
   become: true
   ansible.builtin.copy:
-    src: "GeoIP2-City.mmdb"
+    src: "{{ database }}"
     dest: "/etc/coredns/"
     owner: "coredns"
     group: "coredns"
