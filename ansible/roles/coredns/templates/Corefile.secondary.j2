@@ -40,10 +40,6 @@ olegrumpy.ru {
     metadata
     file {{ coredns_workdir }}/db-us.olegrumpy.ru
 
-    transfer {
-        to {{ coredns_secondary_ip }}
-    }
-
     health :8080
     prometheus :9153
     log
@@ -59,10 +55,6 @@ olegrumpy.ru {
     }
     metadata
     file {{ coredns_workdir }}/db-asia.olegrumpy.ru
-
-    transfer {
-        to {{ coredns_secondary_ip }}
-    }
 
     health :8080
     prometheus :9153
