@@ -72,6 +72,7 @@
   ansible.builtin.systemd:
     name: systemd-resolved
     state: stopped
+    enabled: false
   tags:
     - coredns
 
@@ -154,5 +155,6 @@
   ansible.builtin.systemd:
     name: coredns
     state: started
+    enabled: true
   tags:
     - coredns
