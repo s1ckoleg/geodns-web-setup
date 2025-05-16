@@ -1,4 +1,4 @@
 apiVersion: v2
 name: web-chart
 description: A Helm chart for web deployments
-version: 0.2.6
+version: 0.2.11

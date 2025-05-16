@@ -1,4 +1,3 @@
-# HTTP (redirect to HTTPS)
 server {
     listen 80;
     listen [::]:80;

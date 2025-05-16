@@ -13,5 +13,5 @@ deployment:
   name: entry
   replicas: 6
   image: cr.yandex/crpftiduupc1q0p2dmgt/entry
-  version: "0.1.15"
+  version: "0.1.19"
   pullSecrets: regcred
